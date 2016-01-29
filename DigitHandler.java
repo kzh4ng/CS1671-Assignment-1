@@ -54,6 +54,14 @@ public class DigitHandler {
         return finished.toString();
     }
 
+    public static String replaceDate(String s){
+        StringBuilder sb = new StringBuilder(s);
+        String split[] = sb.toString().split("\\s");                    //split at space and retain month
+        removeAllNonDigits(sb);                                         //implement date - point to process denominator eventually
+        split[1] = processDate(split[1]);
+        return split[0].concat(" " + split[1]);
+    }
+
     private static void removeSpacesAndCommas(StringBuilder sb) {
         int j = 0;
         for(int i = 0; i < sb.length(); i++) {
@@ -63,7 +71,15 @@ public class DigitHandler {
         }
         sb.delete(j, sb.length());
     }
-
+    private static void removeAllNonDigits(StringBuilder sb) {
+        int j = 0;
+        for(int i = 0; i < sb.length(); i++) {
+            if (Character.isDigit(sb.charAt(i))) {
+                sb.setCharAt(j++, sb.charAt(i));
+            }
+        }
+        sb.delete(j, sb.length());
+    }
 
     private static String processDigits(String s){
         StringBuilder result = new StringBuilder();
@@ -80,18 +96,10 @@ public class DigitHandler {
             for (int i = 0; i < numberOfGroups; i++) {
                 digitGroups[i] = digitGroups[i].reverse();                          //append put the digits in reverse order
             }
+            boolean first = true;
             for (int i = numberOfGroups-1; i > -1; i--) {
-                digitGroups[i] = translateDigits(digitGroups[i]);
-                switch (i){
-                    case 4: digitGroups[i].append(" trillion ");
-                        break;
-                    case 3: digitGroups[i].append(" billion ");
-                        break;
-                    case 2: digitGroups[i].append(" million ");
-                        break;
-                    case 1: digitGroups[i].append(" thousand ");
-                        break;
-                }
+                digitGroups[i] = translateDigits(digitGroups[i], i, first);
+                first = false;
             }
             for(int i = numberOfGroups - 1; i > -1; i--){
                 result.append(digitGroups[i]);
@@ -99,41 +107,69 @@ public class DigitHandler {
         }
         else{
             StringBuilder digits = new StringBuilder(s);
-            result  = translateDigits(digits);
+            result  = translateDigits(digits, 0, false);
         }
 
         return result.toString();
     }
 
-    private static StringBuilder translateDigits(StringBuilder s){
+    private static StringBuilder translateDigits(StringBuilder s, int degree, boolean first){
         StringBuilder builder = new StringBuilder();
+        boolean printedWord = false;
         if (s.length() == 3){
-            builder.append(WordLibrary.simpleNumberWord(s.charAt(0))+ " hundred ");         // most significant digit
-            if(s.charAt(1) == '1'){
-                builder.append(WordLibrary.teenWords(s.charAt(2)));                         //second digit
+            if(s.charAt(0) != '0') {
+                builder.append(WordLibrary.simpleNumberWord(s.charAt(0))+ " hundred ");         // most significant digit
+                printedWord = true;
+            }
+            if(s.charAt(1) == '1') {
+                builder.append(WordLibrary.teenWords(s.charAt(2)) + powerOfTen(degree));                         //second digit
                 return builder;
             }
-            else if(s.charAt(1) != '0'){
+            else if(s.charAt(1) != '0') {
                 builder.append(WordLibrary.tenWords(s.charAt(1)) + " ");
+                printedWord = true;
             }
-            if(s.charAt(2) == '0') return builder;                              //last digit
-            else builder.append(WordLibrary.simpleNumberWord(s.charAt(2)));
+            if(s.charAt(2) != '0')  {
+                builder.append(WordLibrary.simpleNumberWord(s.charAt(2)) + powerOfTen(degree));
+            }
         }
         else if(s.length() == 2){
             if(s.charAt(0) == '1'){
-                builder.append(WordLibrary.teenWords(s.charAt(1)));
+                builder.append(WordLibrary.teenWords(s.charAt(1)) + powerOfTen(degree));
+                return  builder;
             }
             else if(s.charAt(0) != '0'){
                 builder.append(WordLibrary.tenWords(s.charAt(0)) + " ");
+                printedWord = true;
             }
-            if(s.charAt(1) == '0') return builder;                              //last digit
-            else builder.append(WordLibrary.simpleNumberWord(s.charAt(1)));
+            if(s.charAt(1) != '0') {
+                builder.append(WordLibrary.simpleNumberWord(s.charAt(1)));
+                printedWord = true;
+            }
         }
         else if(s.length() == 1){ // change to string length 1
-            builder.append(WordLibrary.simpleNumberWord(s.charAt(0)));
+            if(!(s.charAt(0) == 0)) builder.append(WordLibrary.simpleNumberWord(s.charAt(0)));
+            printedWord = true;
         }
-
+        if(first || printedWord){
+            builder.append(powerOfTen(degree));
+        }
         return builder;
+    }
+
+    private static String powerOfTen (int i){
+        String result = "";
+        switch (i){
+            case 4: result = " trillion ";
+                break;
+            case 3: result =" billion ";
+                break;
+            case 2: result =" million ";
+                break;
+            case 1: result =" thousand ";
+                break;
+        }
+        return result;
     }
 
     private static String processDecimals(String s){
@@ -144,10 +180,54 @@ public class DigitHandler {
         return numbers.toString();
     }
 
-    private static String processDenominator(String s){ //supports up to 20ths
+
+    private static String processDenominator(String s){ //supports up to and including 99ths
         StringBuilder number = new StringBuilder();
-        int denominator = Integer.parseInt(s);
-        number.append(WordLibrary.fractionWords(denominator));
+        if(s.length() == 2){
+            if (s.charAt(0) == '1'){                                                            //knockout teens and multiples of ten
+                number.append(WordLibrary.teenFractions(s.charAt(1)));
+                return number.toString();
+            }
+            if (s.charAt(1) == '0'){
+                number.append(WordLibrary.tenFractions(s.charAt(0)));
+                return number.toString();
+            }
+            number.append(WordLibrary.tenWords(s.charAt(0)) + " ");
+            if(s.charAt(1) == '1' || s.charAt(1) == '2'){
+                number.append(WordLibrary.firstorSecond(s.charAt(1)));
+                return number.toString();
+            }
+            else number.append(WordLibrary.fractionWords(s.charAt(1)));
+        }
+        else{
+            number.append(" " + WordLibrary.fractionWords(s.charAt(0)));
+        }
+        return number.toString();
+    }
+
+    private static String processDate(String s){
+        StringBuilder number = new StringBuilder();
+        if(s.length() == 2){
+            if (s.charAt(0) == '1'){                                                            //knockout teens and multiples of ten
+                number.append(WordLibrary.teenFractions(s.charAt(1)));
+                return number.toString();
+            }
+            if (s.charAt(1) == '0'){
+                number.append(WordLibrary.tenFractions(s.charAt(0)));
+                return number.toString();
+            }
+            number.append(WordLibrary.tenWords(s.charAt(0)) + " ");
+            if(s.charAt(1) == '1' || s.charAt(1) == '2'){
+                number.append(WordLibrary.firstorSecond(s.charAt(1)));
+                return number.toString();
+            }
+            number.append(WordLibrary.fractionWords(s.charAt(1)));
+        }
+        else{
+            if(s.charAt(0) == '1') number.append(WordLibrary.firstorSecond('1'));
+            else if(s.charAt(0) == '2') number.append(WordLibrary.firstorSecond('2'));
+            else number.append(WordLibrary.fractionWords(s.charAt(0)));
+        }
         return number.toString();
     }
 }
