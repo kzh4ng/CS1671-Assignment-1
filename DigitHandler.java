@@ -6,6 +6,7 @@ public class DigitHandler {
 
     public static String replaceNumber(String s){
         StringBuilder sb = new StringBuilder(s);
+        StringBuilder finished = new StringBuilder();
         removeSpacesAndCommas(sb);
         String numbers[] = new String[2];
         if(sb.indexOf(".") > 0){                            //if there is a decimal in the number
@@ -13,9 +14,43 @@ public class DigitHandler {
             numbers = str.split("\\.");
             numbers[0] = processDigits(numbers[0]);
             numbers[1] = processDecimals(numbers[1]);
+            finished.append(numbers[0] + " point " + numbers[1]);
         }
+        else{
+            numbers[0] = processDigits(sb.toString());
+            finished.append(numbers[0]);
+        }
+        return finished.toString();
+    }
+
+    public static String replaceFraction(String s){         //split at the slash and process numerator/denominator separately
+        StringBuilder sb = new StringBuilder(s);
         StringBuilder finished = new StringBuilder();
-        finished.append(numbers[0] + " point " + numbers[1]);
+        removeSpacesAndCommas(sb);
+        String mixed[];
+        boolean containsWhitespace = false;
+        for (int i = 0; i < sb.length() && !containsWhitespace; i++) {
+            if (Character.isWhitespace(sb.charAt(i))) {
+                containsWhitespace = true;
+            }
+        }
+        if(containsWhitespace){                                     //mixed number
+            String mixedNumber = sb.toString();
+            mixed = mixedNumber.split("\\s");
+            mixed[0] = processDigits(mixed[0]);
+            String fraction[] = mixed[1].split("/");
+            fraction[0] = processDigits(fraction[0]);
+            fraction[1] = processDenominator(fraction[1]);
+            finished.append(mixed[0] + " and " + fraction[0] + " " + fraction[1]);
+        }
+        else{                                                       //not a mixed number
+            String str = sb.toString();
+            String fraction[] = str.split("/");
+            fraction[0] = processDigits(fraction[0]);
+            fraction[1] = processDenominator(fraction[1]);
+            finished.append(fraction[0] + " " + fraction[1]);
+        }
+
         return finished.toString();
     }
 
@@ -25,12 +60,10 @@ public class DigitHandler {
             if (!Character.isWhitespace(sb.charAt(i)) || !Character.isLetter(',')) {
                 sb.setCharAt(j++, sb.charAt(i));
             }
-            /*if (Character.isDigit(sb.charAt(i)) || Character.isLetter('.')){
-                sb.setCharAt(j++, sb.charAt(i));
-            }*/
         }
         sb.delete(j, sb.length());
     }
+
 
     private static String processDigits(String s){
         StringBuilder result = new StringBuilder();
@@ -109,5 +142,12 @@ public class DigitHandler {
             numbers.append(WordLibrary.simpleNumberWord(s.charAt(i)) + " ");
         }
         return numbers.toString();
+    }
+
+    private static String processDenominator(String s){ //supports up to 20ths
+        StringBuilder number = new StringBuilder();
+        int denominator = Integer.parseInt(s);
+        number.append(WordLibrary.fractionWords(denominator));
+        return number.toString();
     }
 }

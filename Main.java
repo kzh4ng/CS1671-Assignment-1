@@ -14,17 +14,10 @@ public class Main {
         File file = new File("numbers.txt");
         Charset encoding = Charset.defaultCharset();
 
-        Pattern pattern = Pattern.compile("(\\d*,\\d*)*");
-        Matcher matcher = pattern.matcher("1234,33241,3234 asdfaesf 1,2,3");
 
-        int count = 0;
-        /*while(matcher.find()) {
-            count++;
-            System.out.println("found: " + count + " : "
-                    + matcher.start() + " - " + matcher.end());
-        }*/
         parseFile(file, encoding);
-        text = findDollars(text);
+        text = findFractions(0);                                    //vary
+        text = findNumbers(0);
         System.out.println(text.toString());
     }
     private static void parseFile(File file, Charset encoding) throws IOException{ // read file
@@ -42,16 +35,32 @@ public class Main {
             char ch = (char) r;
             text.append(ch);
         }
+        removeBackslash(text);
         System.out.println(text.toString());
-
-    }
-    private static StringBuffer findDollars (StringBuffer sb){
-        Pattern p0 = Pattern.compile("\\d+\\.\\d+");            // $ 123
-        return findPatterns(p0);
-
     }
 
-    private static StringBuffer findPatterns(Pattern p){
+    private static void removeBackslash(StringBuffer sb) {
+        for(int i = 0; i < sb.length(); i++) {
+            if (sb.charAt(i) == '\\') {
+                sb.deleteCharAt(i);
+            }
+        }
+    }
+    private static StringBuffer findFractions (int i){
+        Pattern p0 = Pattern.compile("\\d+\\s\\d+/\\d+");
+        Pattern p1 = Pattern.compile("\\d+/\\d+");
+        Pattern variations[] = {p0, p1};
+        return findPatterns(variations[i], true);
+    }
+
+    private static StringBuffer findNumbers(int i){
+        Pattern p1 = Pattern.compile("\\d+.\\d+");
+        Pattern p2 = Pattern.compile("\\d+");
+        Pattern variations[] = {p1, p2};
+        return findPatterns(variations[i], false);
+    }
+
+    private static StringBuffer findPatterns(Pattern p, boolean fraction){
         Matcher m = p.matcher(text);
 
         System.out.println("Pattern found: " + m.matches());
@@ -60,7 +69,8 @@ public class Main {
         StringBuffer buffer = new StringBuffer();
 
         while(m.find()){                                            //find each case of a pattern match
-            m.appendReplacement(buffer, DigitHandler.replaceNumber(m.group()));
+            if(fraction) m.appendReplacement(buffer, DigitHandler.replaceFraction(m.group()));
+            else m.appendReplacement(buffer, DigitHandler.replaceNumber(m.group()));
             System.out.println(buffer.toString());
         }
         m.appendTail(buffer);

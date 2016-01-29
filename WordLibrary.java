@@ -11,9 +11,8 @@ public class WordLibrary {
     private static final String POWERS[] = { "hundred", "thousand", "million", "billion", "trillion"};
     private static final String FRACTIONS[] = {"half", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
             "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
-            "seventeenth", "eighteenth", "nineteenth", "twentieth",
-            "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetieth"};
-    private static final String FRACTIONPOWERS[] = { "hundredth" , "thousandth", "millionth", "billionth", "trillionth"};
+            "seventeenth", "eighteenth", "nineteenth", "twentieth", "thirtieth"};
+    private static final String XTRAFRACTIONS[] = {"first", "second"};
 
     public static String simpleNumberWord(char digit){
         String representation;
@@ -94,6 +93,52 @@ public class WordLibrary {
                 break;
             default: representation = "uh oh";
                 break;
+        }
+        return representation;
+    }
+
+    public static String fractionWords(int number){
+        String representation;
+        switch (number){
+            case 2: representation = FRACTIONS[0];
+                break;
+            case 3: representation = FRACTIONS[1];
+                break;
+            case 4: representation = FRACTIONS[2];
+                break;
+            case 5: representation = FRACTIONS[3];
+                break;
+            case 6: representation = FRACTIONS[4];
+                break;
+            case 7: representation = FRACTIONS[5];
+                break;
+            case 8: representation = FRACTIONS[6];
+                break;
+            case 9: representation = FRACTIONS[7];
+                break;
+            case 10: representation = FRACTIONS[8];
+                break;
+            case 11: representation = FRACTIONS[9];
+                break;
+            case 12: representation = FRACTIONS[10];
+                break;
+            case 13: representation = FRACTIONS[11];
+                break;
+            case 14: representation = FRACTIONS[12];
+                break;
+            case 15: representation = FRACTIONS[13];
+                break;
+            case 16: representation = FRACTIONS[14];
+                break;
+            case 17: representation = FRACTIONS[15];
+                break;
+            case 18: representation = FRACTIONS[16];
+                break;
+            case 19: representation = FRACTIONS[17];
+                break;
+            case 20: representation = FRACTIONS[18];
+                break;
+            default: representation = "uh oh fraction";
         }
         return representation;
     }
