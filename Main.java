@@ -17,8 +17,11 @@ public class Main {
         for (int i = 0; i < 22; i++) {
             text = findDates(i);
         }
+        for (int i = 0; i < 8; i++) {
+            text = findDollars(i);
+        }
         for (int i = 0; i < 2; i++) {
-            text = findFractions(i);                                    //vary
+            text = findFractions(i);
         }
         for (int i = 0; i < 2; i++) {
             text = findNumbers(i);
@@ -76,24 +79,42 @@ public class Main {
         Pattern p20 = Pattern.compile("November\\s\\d\\d?");
         Pattern p21 = Pattern.compile("December\\s\\d\\d?");
         Pattern dates[] = {p0, p1 ,p2 ,p3 ,p4 ,p5 ,p6 ,p7 ,p8 ,p9 ,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21};
-        return findPatterns(dates[i], false, true);
+        return findPatterns(dates[i], false, true, false);
+    }
+
+    private static StringBuffer findDollars(int i){
+        Pattern p0 = Pattern.compile("\\$\\s?\\d+\\.\\d+\\smillion");
+        Pattern p0a = Pattern.compile("\\$\\s?\\d+\\smillion");
+        Pattern p1 = Pattern.compile("\\$\\s?\\d+\\.\\d+\\sbillion");
+        Pattern p1a = Pattern.compile("\\$\\s?\\d+\\sbillion");
+        Pattern p2 = Pattern.compile("\\$\\s?\\d+\\.\\d+\\strillion");
+        Pattern p2a = Pattern.compile("\\$\\s?\\d+\\strillion");
+        Pattern p3 = Pattern.compile("\\$\\s?\\d+\\.\\d+");
+        Pattern p4 = Pattern.compile("\\$\\s?\\d+");
+        Pattern variations[] = {p0, p0a, p1, p1a, p2, p2a, p3, p4};
+        return findPatterns(variations[i], false, false, true);
     }
 
     private static StringBuffer findFractions (int i){
         Pattern p0 = Pattern.compile("\\d+\\s\\d+/\\d+");
         Pattern p1 = Pattern.compile("\\d+/\\d+");
         Pattern variations[] = {p0, p1};
-        return findPatterns(variations[i], true, false);
+        return findPatterns(variations[i], true, false, false);
     }
 
     private static StringBuffer findNumbers(int i){
         Pattern p1 = Pattern.compile("\\d+.\\d+");
         Pattern p2 = Pattern.compile("\\d+");
         Pattern variations[] = {p1, p2};
-        return findPatterns(variations[i], false, false);
+        return findPatterns(variations[i], false, false, false);
     }
 
-    private static StringBuffer findPatterns(Pattern p, boolean fraction, boolean date){
+    private static StringBuffer findPercents(){
+        Pattern p = Pattern.compile("%");
+        return findPatterns(p, false, false, false);
+    }
+
+    private static StringBuffer findPatterns(Pattern p, boolean fraction, boolean date, boolean dollars){
         Matcher m = p.matcher(text);
 
         //System.out.println("Pattern found: " + m.matches());
@@ -104,6 +125,7 @@ public class Main {
         while(m.find()){                                            //find each case of a pattern match
             if(fraction) m.appendReplacement(buffer, DigitHandler.replaceFraction(m.group()));
             else if (date) m.appendReplacement(buffer, DigitHandler.replaceDate(m.group()));
+            else if (dollars) m.appendReplacement(buffer, DigitHandler.replaceDollars(m.group()));
             else m.appendReplacement(buffer, DigitHandler.replaceNumber(m.group()));
             System.out.println(buffer.toString());
         }

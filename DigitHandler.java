@@ -62,6 +62,36 @@ public class DigitHandler {
         return split[0].concat(" " + split[1]);
     }
 
+    public static String replaceDollars(String s){
+        s = s.replaceFirst("\\$\\s?", "");
+        String result[];
+        if(s.contains("illion")){
+            //s = s.substring(2);
+            result = s.split("\\s");
+            if(result[0].contains(".")){
+                String nonInteger[] = result[0].split("\\.");
+                result[0] = processDigits(nonInteger[0]).concat(" point " + processDecimals(nonInteger[1]));
+            }
+            else{
+                result[0] = processDigits(result[0]);
+            }
+            result[1] = result[1].concat(" dollars");
+        }
+        else{
+            if(s.contains(".")){
+                result = s.split("\\.");
+                result[0] = processDigits(result[0]).concat(" dollars and ");
+                result[1] = processDigits(result[1]).concat(" cents");
+            }
+            else{
+                result = s.split("\\s");
+                result[0] = processDigits(result[0]);
+                result[1] = result[1].concat(" dollars");
+            }
+        }
+        return result[0].concat(" " + result[1]);
+    }
+
     private static void removeSpacesAndCommas(StringBuilder sb) {
         int j = 0;
         for(int i = 0; i < sb.length(); i++) {
@@ -71,6 +101,8 @@ public class DigitHandler {
         }
         sb.delete(j, sb.length());
     }
+
+
     private static void removeAllNonDigits(StringBuilder sb) {
         int j = 0;
         for(int i = 0; i < sb.length(); i++) {
@@ -82,6 +114,9 @@ public class DigitHandler {
     }
 
     private static String processDigits(String s){
+        StringBuilder preprocess = new StringBuilder(s);
+        removeAllNonDigits(preprocess);
+        s = preprocess.toString();
         StringBuilder result = new StringBuilder();
         if(s.length() > 3){
             StringBuilder digitGroups[] = new StringBuilder[4];

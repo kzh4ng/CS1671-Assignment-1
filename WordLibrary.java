@@ -15,6 +15,8 @@ public class WordLibrary {
     private static final String FRACTIONPOWERS[] = { "hundredth" , "thousandth", "millionth", "billionth", "trillionth"};
     private static final String XTRAFRACTIONS[] = {"first", "second"};
 
+    public static String percent = "percent";
+
     public static String simpleNumberWord(char digit){
         String representation;
         switch (digit){
@@ -38,7 +40,7 @@ public class WordLibrary {
                 break;
             case '9':  representation = NUMBERS[9];
                 break;
-            default: representation = "something went wrong";
+            default: representation = "simpleNumberWord";
                 break;
         }
         return representation;
@@ -67,7 +69,7 @@ public class WordLibrary {
                 break;
             case '9': representation = NUMBERS[19];
                 break;
-            default: representation = "uh oh";
+            default: representation = "teenWords";
                 break;
         }
         return representation;
@@ -92,7 +94,7 @@ public class WordLibrary {
                 break;
             case '9': representation = NUMBERS[27];
                 break;
-            default: representation = "uh oh";
+            default: representation = "tenWords";
                 break;
         }
         return representation;
@@ -117,7 +119,7 @@ public class WordLibrary {
                 break;
             case '9': representation = FRACTIONS[7];
                 break;
-            default: representation = "uh oh fraction";
+            default: representation = "fractionWords";
         }
         return representation;
     }
@@ -145,7 +147,7 @@ public class WordLibrary {
                 break;
             case '9': representation = FRACTIONS[17];
                 break;
-            default: representation = "uh oh fraction";
+            default: representation = "teenFractions";
                 break;
         }
         return representation;
@@ -157,7 +159,7 @@ public class WordLibrary {
                 break;
             case '2': representation = XTRAFRACTIONS[1];
                 break;
-            default: representation = "problem";
+            default: representation = "firstorSecond";
                 break;
         }
         return representation;
@@ -181,7 +183,7 @@ public class WordLibrary {
                 break;
             case '9': representation = FRACTIONS[25];
                 break;
-            default: representation = "uh oh fraction";
+            default: representation = "tenFractions";
                 break;
         }
         return representation;
